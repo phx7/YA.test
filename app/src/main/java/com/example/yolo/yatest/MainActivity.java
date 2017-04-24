@@ -248,9 +248,9 @@ public class MainActivity extends AppCompatActivity {
                             cv.put("input", original_input);
                             cv.put("translation", response_text);
                             // подключаемся к БД
-                            //SQLiteDatabase db = dbHelper.getWritableDatabase();
+                            SQLiteDatabase db = dbHelper.getWritableDatabase();
                             // вставляем запись и получаем ее ID
-                            //db.insert("mytable", null, cv);
+                            db.insert("mytable", null, cv);
                             //reload_history();
                         }
                     }
