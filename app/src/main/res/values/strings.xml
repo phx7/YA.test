@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">YA.test</string>
+    <string name="do_translate">Перевести</string>
+    <string name="action_settings">Настройки</string>
+    <string name="section_format">Тут пока ничего нет: %1$d</string>
+    <string name="switch_ruen">Русский → Английский</string>
+    <string name="switch_enru">Английский → Русский</string>
+    <string name="switch_history">История</string>
+    <string name="switch_favourite">Избранное</string>
+    <string name="translate_direction">Направление перевода</string>
+    <string name="offline">Отсутствует интернет подключение</string>
+    <string name="no_text">Введите текст для перевода</string>
+    <string name="smth_wrong">Что-то пошло не так</string>
+</resources>
