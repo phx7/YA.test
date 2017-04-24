@@ -17,6 +17,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.JsonReader;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -130,11 +131,11 @@ public class MainActivity extends AppCompatActivity {
         private ToggleButton translate_direction_button;
         private ToggleButton history_toggle;
         private ListView history_list;
-        private WebView translate_webview;
-        private String api_key = "trnsl.1.1.20170419T211235Z.6a560078798c2f09.a9a817d264aa28783ea8216b37d07bb1a3dfa4dd";
+        private String dictionary_api_key = "dict.1.1.20170424T152637Z.49e7684becbf1ba6.f18510c65bba2ff899a8d6e3ab2b11ae27fb7e62";
         private String translate_direction = "en-ru";
         private EditText translate_text;
         private TextView debug_text;
+        public String html_text = "";
         public String response_text = "";
 
         public PlaceholderFragment() {
@@ -160,7 +161,6 @@ public class MainActivity extends AppCompatActivity {
 
                 // ?????
                 translate_button = (Button)rootView.findViewById(R.id.button);
-                translate_webview = (WebView)rootView.findViewById(R.id.webview);
                 translate_direction_button = (ToggleButton)rootView.findViewById(R.id.toggleButton);
                 translate_text = (EditText)rootView.findViewById(R.id.editText);
                 debug_text = (TextView)rootView.findViewById(R.id.textView);
@@ -195,9 +195,8 @@ public class MainActivity extends AppCompatActivity {
                             } catch (UnsupportedEncodingException e) {
                                 e.printStackTrace();
                             }
-                            String url = "https://translate.yandex.net/api/v1.5/tr.json/translate?key=" + api_key + "&text=" + text_to_translate + "&lang=" + translate_direction;
-                            //translate_webview.loadUrl(url);
-                            //debug_text.setText(url);
+                            //String url = "https://translate.yandex.net/api/v1.5/tr.json/translate?key=" + translation_api_key + "&text=" + text_to_translate + "&lang=" + translate_direction;
+                            String url = "https://dictionary.yandex.net/api/v1/dicservice.json/lookup?key=" + dictionary_api_key + "&text=" + text_to_translate + "&lang=" + translate_direction + "&ui=ru";
 
                             // Instantiate the RequestQueue.
                             RequestQueue queue = Volley.newRequestQueue(getContext());
@@ -209,9 +208,27 @@ public class MainActivity extends AppCompatActivity {
                                         public void onResponse(String response) {
                                             try {
                                                 JSONObject json = new JSONObject(response);
-                                                JSONArray json_array = json.getJSONArray("text");
-                                                debug_text.setText(json_array.getString(0));
-                                                response_text = json_array.getString(0);
+                                                JSONArray def = json.getJSONArray("def");
+                                                // части речи
+                                                for (int i1 = 0; i1 < def.length(); i1++) {
+                                                    JSONObject row = def.getJSONObject(i1);
+                                                    System.out.println(row.getString("text"));
+                                                    System.out.println(row.getString("pos"));
+                                                    System.out.println(row.getString("ts"));
+                                                    html_text += "<b>" + row.getString("text") + "</b>";
+                                                    html_text += " <i>(" + row.getString("pos") + ")</i>";
+                                                    html_text += "<br>Транскрипция: [" + row.getString("ts") + "]";
+                                                    html_text += "<br>Перевод(ы):";
+                                                    // переводы
+                                                    JSONArray tr = row.getJSONArray("tr");
+                                                    for (int i2 = 0; i2 < tr.length(); i2++) {
+                                                        JSONObject tr_n = tr.getJSONObject(i2);
+                                                        html_text += "<br><li>" + tr_n.getString("text") + "</li>";
+                                                        System.out.println(">>" + tr_n.getString("text"));
+                                                    }
+                                                }
+                                                //  debug_text.setText(response);
+                                                debug_text.setText(Html.fromHtml(html_text));
                                             } catch (JSONException e) {
                                                 Toast.makeText(getContext(), getResources().getString(R.string.smth_wrong), Toast.LENGTH_LONG).show();
                                             }
@@ -231,9 +248,9 @@ public class MainActivity extends AppCompatActivity {
                             cv.put("input", original_input);
                             cv.put("translation", response_text);
                             // подключаемся к БД
-                            SQLiteDatabase db = dbHelper.getWritableDatabase();
+                            //SQLiteDatabase db = dbHelper.getWritableDatabase();
                             // вставляем запись и получаем ее ID
-                            db.insert("mytable", null, cv);
+                            //db.insert("mytable", null, cv);
                             //reload_history();
                         }
                     }
